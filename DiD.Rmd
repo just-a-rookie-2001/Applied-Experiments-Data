@@ -27,35 +27,26 @@ library(dplyr)
 
 ```{r}
 
-# Load the Excel file
 data <- read.csv("out.csv")
 
-# Convert 'promotion used?' column to factor
 data$promotion <- as.factor(data$`promotion.used.`)
 
-# Create a treatment indicator based on 'promotion used?' column
 data$treatment <- ifelse(data$promotion %in% c("yes", "pre-trt"), 1, 0)
 
-# Create a post-treatment indicator
 data$post <- ifelse(data$promotion %in% c("yes", "no"), 1, 0)
 
-# Run the DiD regression
 did_model <- lm(revenue.earned ~ treatment + post + treatment:post, data = data)
 
-# Display the results
 summary(did_model)
 ```
 
 ```{r}
-# Create a pre-treatment indicator
 data$pre <- ifelse(data$promotion %in% c("pre-trt", "pre-ctrl"), 1, 0)
 
-set.seed(420) # Set seed for reproducibility
+set.seed(420)
 data$placebo_pre_treatment <- sample(c(0, 1), nrow(data), replace = TRUE)
 
-# Run the DiD regression with the placebo pre-treatment indicator
 placebo_did_model <- lm(revenue.earned ~ placebo_pre_treatment + pre + placebo_pre_treatment:pre, data = data)
 
-# Display the results of placebo test
 summary(placebo_did_model)
 ```
